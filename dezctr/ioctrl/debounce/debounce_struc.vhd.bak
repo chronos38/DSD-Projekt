@@ -1,0 +1,22 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.numeric_std.ALL;
+
+architecture Behavioral of Debounce is
+signal keydeb : STD_LOGIC_VECTOR(width-1 downto 0) := (others=>'0');
+signal debcnt : integer range 0 to delay := 0;
+begin
+   process begin
+      wait until rising_edge(clk);
+      if (keyin=keydeb) then debcnt <= 0;
+      else                   debcnt <= debcnt+1;
+      end if;
+      int <= '0';
+      if (debcnt=delay) then 
+         keydeb <= keyin; 
+         int    <= '1';
+      end if;
+   end process;
+   keyout <= keydeb;
+
+end Behavioral;

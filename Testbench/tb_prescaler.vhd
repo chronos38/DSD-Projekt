@@ -31,9 +31,9 @@ begin
 
   p_test : process
     begin
-      s_reset_n <= '1';
+      s_reset_n <= '0';
 		  wait for 20 ps;
-	  s_reset_n <= '0';
+	  s_reset_n <= '1';
       wait for 40000 ps;
     end process;
 

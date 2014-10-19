@@ -1,0 +1,12 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.numeric_std.ALL;
+
+entity Debounce is
+    Generic ( width  : natural := 8;
+              delay  : natural := 63);
+    Port ( clk       : in   STD_LOGIC;
+           keyin     : in   STD_LOGIC_VECTOR(width-1 downto 0);
+           keyout    : out  STD_LOGIC_VECTOR(width-1 downto 0);
+           int       : out  STD_LOGIC);
+end Debounce;

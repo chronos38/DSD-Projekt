@@ -9,7 +9,7 @@ begin
 
 	p_count_edges : process(clk50, reset_n)
 	begin
-		if reset_n = '1' then
+		if reset_n = '0' then
 			s_clk1 <= '0';
 			s_counter <= (others => '0');
 		elsif rising_edge(clk50) then
