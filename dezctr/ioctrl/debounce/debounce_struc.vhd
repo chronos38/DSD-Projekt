@@ -4,7 +4,7 @@ use IEEE.numeric_std.all;
 
 architecture behavioral of debounce is
 	signal s_keydeb : std_logic_vector(WIDTH-1 downto 0) := (others=>'0');
-	signal s_debcnt : integer range 0 to DELAY := 0;
+	signal s_debcnt : integer range 0 to DELAY + 1 := 0;
 begin
    process begin
       wait until rising_edge(clk50);
