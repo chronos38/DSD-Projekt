@@ -1,0 +1,17 @@
+|dezctr
+clk50 => ~NO_FANOUT~
+reset_n => ~NO_FANOUT~
+sw_i[0] => ~NO_FANOUT~
+sw_i[1] => ~NO_FANOUT~
+sw_i[2] => ~NO_FANOUT~
+sw_i[3] => ~NO_FANOUT~
+sw_i[4] => ~NO_FANOUT~
+sw_i[5] => ~NO_FANOUT~
+sw_i[6] => ~NO_FANOUT~
+sw_i[7] => ~NO_FANOUT~
+sw_i[8] => ~NO_FANOUT~
+sw_i[9] => ~NO_FANOUT~
+pb_i[0] => ~NO_FANOUT~
+pb_i[1] => ~NO_FANOUT~
+
+
