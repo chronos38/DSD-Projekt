@@ -8,15 +8,15 @@ architecture sim of tb_debounce is
 
    component debounce
       generic ( 
-         WIDTH 		: natural;
-         DELAY 		: natural);
+         WIDTH         : natural;
+         DELAY         : natural);
       port ( 
          clk50       : in   std_logic;
          keyin_i     : in   std_logic_vector(WIDTH-1 downto 0);
          keyout_o    : out  std_logic_vector(WIDTH-1 downto 0));
    end component;
   
-  signal s_clk50     : std_logic	:= '0';
+  signal s_clk50     : std_logic    := '0';
   signal s_keyin_i   : std_logic_vector(0 downto 0) := "0";
   signal s_keyout_o  : std_logic_vector(0 downto 0) := "0";
   
@@ -30,8 +30,8 @@ begin
       clk50       => s_clk50,
       keyin_i     => s_keyin_i,
       keyout_o     => s_keyout_o);
-	 
-	s_clk50 <= not s_clk50 after 1 ps;
+     
+    s_clk50 <= not s_clk50 after 1 ps;
 
    p_test : process
       begin
