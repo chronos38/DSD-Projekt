@@ -4,11 +4,9 @@ use IEEE.numeric_std.all;
 
 architecture rtl of decoder is
 begin
-    p_decode : process(clk50, reset_n)
+    p_decode : process(clk50)
     begin
-        if (reset_n) then
-            ss_o <= "00000000";
-        elsif rising_edge(clk50) then
+        if rising_edge(clk50) then
             case cntr_i is
                 when "0000" => ss_o <= "00111111";
                 when "0001" => ss_o <= "00000110";

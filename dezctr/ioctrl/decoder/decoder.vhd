@@ -14,10 +14,12 @@ use IEEE.std_logic_1164.all;
 --   *    *
 --    ****
 --     D3
+
+-- Decoder dient dazu die berechnete Binärzahl in das entsprechende
+-- Displayformat zu transformieren.
 entity decoder is
     port (
         clk50   : in std_logic; -- Takt
-        reset_n : in std_logic; -- Asynchroner Reset
         cntr_i  : in std_logic_vector(4 downto 0); -- Counter
         ss_o    : out std_logic_vector(7 downto 0)); -- Display
 end entity;
