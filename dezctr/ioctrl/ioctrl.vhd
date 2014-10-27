@@ -9,10 +9,10 @@ entity ioctrl is
         sw_i     : in std_logic_vector(9 downto 0); -- Schalter Eingang
         pb_i     : in std_logic_vector(1 downto 0); -- Button Eingang
         
-        cntr0    : in std_logic_vector(4 downto 0); -- Counter 0
-        cntr1    : in std_logic_vector(4 downto 0); -- Counter 1
-        cntr2    : in std_logic_vector(4 downto 0); -- Counter 2
-        cntr3    : in std_logic_vector(4 downto 0); -- Counter 3
+        cntr0    : in std_logic_vector(3 downto 0); -- Counter 0
+        cntr1    : in std_logic_vector(3 downto 0); -- Counter 1
+        cntr2    : in std_logic_vector(3 downto 0); -- Counter 2
+        cntr3    : in std_logic_vector(3 downto 0); -- Counter 3
         
         ss0_o    : out std_logic_vector(7 downto 0); -- Display 0
         ss1_o    : out std_logic_vector(7 downto 0); -- Display 1

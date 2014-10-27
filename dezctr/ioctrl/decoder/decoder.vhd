@@ -20,6 +20,6 @@ use IEEE.std_logic_1164.all;
 entity decoder is
     port (
         clk50   : in std_logic; -- Takt
-        cntr_i  : in std_logic_vector(4 downto 0); -- Counter
+        cntr_i  : in std_logic_vector(3 downto 0); -- Counter
         ss_o    : out std_logic_vector(7 downto 0)); -- Display
 end entity;
