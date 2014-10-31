@@ -1,4 +1,6 @@
 vendor_name = ModelSim
+source_file = 1, D:/Zeugs/VHDL/DSD-Projekt/dezctr/ioctrl/decoder/decoder_struc.vhd
+source_file = 1, D:/Zeugs/VHDL/DSD-Projekt/dezctr/ioctrl/decoder/decoder.vhd
 source_file = 1, D:/Zeugs/VHDL/DSD-Projekt/dezctr/ioctrl/debounce/debounce_struc.vhd
 source_file = 1, D:/Zeugs/VHDL/DSD-Projekt/dezctr/ioctrl/debounce/debounce.vhd
 source_file = 1, D:/Zeugs/VHDL/DSD-Projekt/dezctr/cntr/prescaler/prescaler_struc.vhd
