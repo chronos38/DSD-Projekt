@@ -1,11 +1,11 @@
 architecture rtl of bcd is
     signal s_cntr  : std_logic_vector(3 downto 0);
 begin
-    process (clk50, reset_n)
+    process (clk, reset_n)
     begin
-        if (reset_n = '1') then
+        if (reset_n = '0') then
             s_cntr <= "0000";
-        elsif rising_edge(clk50) then
+        elsif rising_edge(clk) then
             if (reset_i = '1') then
                 s_cntr  <= "0000";
             elsif (enable_i = '1') then

@@ -11,7 +11,7 @@ architecture sim of tb_bcd is
     -- Intialisiere das Testobjekt
     component bcd
         port (
-            clk50       : in std_logic;
+            clk         : in std_logic;
             reset_n     : in std_logic;
             reset_i     : in std_logic; -- Interner Reset
             enable_i    : in std_logic; -- '0'=FALSE und '1'=TRUE
@@ -32,7 +32,7 @@ begin
     -- Erstellt ein Testobjekt
     tb_bcd : bcd
         port map (
-            clk50       => s_clk50,
+            clk         => s_clk50,
             reset_n     => s_reset_n,
             reset_i     => s_reset_i,
             enable_i    => s_enable_i,

@@ -4,7 +4,7 @@ use ieee.numeric_std.all;
 
 entity bcd is
     port(
-        clk50       : in std_logic;
+        clk         : in std_logic;
         reset_n     : in std_logic;
         reset_i     : in std_logic; -- Interner Reset
         enable_i    : in std_logic; -- '0'=FALSE und '1'=TRUE

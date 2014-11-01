@@ -19,12 +19,19 @@ architecture rtl of cntr is
     
     component bcd
         port (
-            clk50       : in std_logic;
+            clk         : in std_logic;
             reset_n     : in std_logic;
             reset_i     : in std_logic; -- Interner Reset
             enable_i    : in std_logic; -- '0'=FALSE und '1'=TRUE
             operation_i : in std_logic; -- '0'=UP und '1'=DOWN
             result_o    : out std_logic_vector(3 downto 0)); -- Ergebnis der Berechnung
+    end component;
+    
+    component prescaler
+        port (
+            clk50   : in std_logic;
+            reset_n : in std_logic;
+            clk1    : out std_logic);
     end component;
 
     -- Es gibt vier Zustände
@@ -36,19 +43,27 @@ architecture rtl of cntr is
     signal s_present_state : t_state; -- Der jetzige Zustand
     signal s_next_state    : t_state; -- Der nächste Zustand
     
-    signal s_cntr0_o : std_logic_vector(3 downto 0); -- Interner Zähler auf Ziffer 1
-    signal s_cntr1_o : std_logic_vector(3 downto 0); -- Interner Zähler auf Ziffer 2
-    signal s_cntr2_o : std_logic_vector(3 downto 0); -- Interner Zähler auf Ziffer 3
-    signal s_cntr3_o : std_logic_vector(3 downto 0); -- Interner Zähler auf Ziffer 4
+    signal s_clk_1s : std_logic := '0'; -- Der interne Takt welcher den Zähler steuert
+    
+    signal s_cntr0_o : std_logic_vector(3 downto 0) := (others => '0'); -- Interner Zähler auf Ziffer 1
+    signal s_cntr1_o : std_logic_vector(3 downto 0) := "0000"; -- Interner Zähler auf Ziffer 2
+    signal s_cntr2_o : std_logic_vector(3 downto 0) := (others => '0'); -- Interner Zähler auf Ziffer 3
+    signal s_cntr3_o : std_logic_vector(3 downto 0) := "0000"; -- Interner Zähler auf Ziffer 4
     
     signal s_reset_bcd  : std_logic := '0'; -- Interner Reset für BCD
     signal s_enable_bcd : std_logic_vector(3 downto 0) := "0000"; -- Enable für BCD, '1'=TRUE
     signal s_op_bcd     : std_logic := '0'; -- Operation für BCD, '0'=UP '1'=DOWN
 begin
+    i_prescaler : prescaler
+        port map(
+            clk50 => clk50,
+            reset_n => reset_n,
+            clk1 => s_clk_1s
+        );
     
     i_bcd0 : bcd
         port map(
-            clk50       => clk50,
+            clk         => s_clk_1s,
             reset_n     => reset_n,
             reset_i     => s_reset_bcd,
             enable_i    => s_enable_bcd(0),
@@ -58,7 +73,7 @@ begin
     
     i_bcd1 : bcd
         port map(
-            clk50       => clk50,
+            clk         => s_clk_1s,
             reset_n     => reset_n,
             reset_i     => s_reset_bcd,
             enable_i    => s_enable_bcd(1),
@@ -68,7 +83,7 @@ begin
     
     i_bcd2 : bcd
         port map(
-            clk50       => clk50,
+            clk         => s_clk_1s,
             reset_n     => reset_n,
             reset_i     => s_reset_bcd,
             enable_i    => s_enable_bcd(2),
@@ -78,7 +93,7 @@ begin
     
     i_bcd3 : bcd
         port map(
-            clk50       => clk50,
+            clk         => s_clk_1s,
             reset_n     => reset_n,
             reset_i     => s_reset_bcd,
             enable_i    => s_enable_bcd(3),
@@ -88,7 +103,7 @@ begin
     
     p_state : process(clk50, reset_n)
     begin
-        if (reset_n = '1') then -- Externer Reset
+        if (reset_n = '0') then -- Externer Reset
             s_present_state <= UP;
             cntr0_o <= "0000";
             cntr1_o <= "0000";

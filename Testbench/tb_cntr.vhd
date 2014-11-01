@@ -24,17 +24,17 @@ architecture sim of tb_cntr is
     end component;
 
     signal s_clk50   : std_logic := '0';
-    signal s_reset_n : std_logic := '1';
+    signal s_reset_n : std_logic := '0';
     
     signal s_ctup_i     : std_logic := '0';
     signal s_ctdown_i   : std_logic := '0';
     signal s_ctreset_i  : std_logic := '0';
     signal s_cthold_i   : std_logic := '0';
     
-    signal s_cntr0_o : std_logic_vector(3 downto 0);
-    signal s_cntr1_o : std_logic_vector(3 downto 0);
-    signal s_cntr2_o : std_logic_vector(3 downto 0);
-    signal s_cntr3_o : std_logic_vector(3 downto 0);
+    signal s_cntr0_o : std_logic_vector(3 downto 0) := (others => '0');
+    signal s_cntr1_o : std_logic_vector(3 downto 0) := "0000";
+    signal s_cntr2_o : std_logic_vector(3 downto 0) := (others => '0');
+    signal s_cntr3_o : std_logic_vector(3 downto 0) := "0000";
 begin
     s_clk50 <= not s_clk50 after 20 ps;
 
@@ -56,7 +56,7 @@ begin
     begin
         -- Testfall: Externer Reset
         -- Alle Eingänge auf '1'
-        s_reset_n   <= '1';
+        s_reset_n   <= '0';
         s_ctup_i    <= '1';
         s_ctdown_i  <= '1';
         s_cthold_i  <= '1';
@@ -65,7 +65,7 @@ begin
         
         -- Testfall: Nach Reset sollte der Zustand UP sein.
         -- Alle Eingänge auf '0'
-        s_reset_n   <= '0';
+        s_reset_n   <= '1';
         s_ctup_i    <= '0';
         s_ctdown_i  <= '0';
         s_cthold_i  <= '0';
@@ -74,7 +74,7 @@ begin
         
         -- Testfall: DOWN
         -- s_ctdown_i auf '1'
-        s_reset_n   <= '0';
+        s_reset_n   <= '1';
         s_ctup_i    <= '0';
         s_ctdown_i  <= '1';
         s_cthold_i  <= '0';
@@ -83,7 +83,7 @@ begin
         
         -- Testfall: UP
         -- s_ctdown_i auf '1'
-        s_reset_n   <= '0';
+        s_reset_n   <= '1';
         s_ctup_i    <= '1';
         s_ctdown_i  <= '0';
         s_cthold_i  <= '0';
@@ -92,7 +92,7 @@ begin
         
         -- Testfall: HOLD
         -- s_ctdown_i auf '1'
-        s_reset_n   <= '0';
+        s_reset_n   <= '1';
         s_ctup_i    <= '0';
         s_ctdown_i  <= '0';
         s_cthold_i  <= '1';
@@ -101,7 +101,7 @@ begin
         
         -- Testfall: RESET
         -- s_ctdown_i auf '1'
-        s_reset_n   <= '0';
+        s_reset_n   <= '1';
         s_ctup_i    <= '0';
         s_ctdown_i  <= '0';
         s_cthold_i  <= '0';
@@ -109,7 +109,7 @@ begin
         wait for 1 ns;
         
         -- Testfall: Externer Reset '0', der Rest '1'
-        s_reset_n   <= '0';
+        s_reset_n   <= '1';
         s_ctup_i    <= '1';
         s_ctdown_i  <= '1';
         s_cthold_i  <= '1';
