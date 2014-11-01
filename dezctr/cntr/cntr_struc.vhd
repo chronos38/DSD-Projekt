@@ -30,17 +30,18 @@ architecture rtl of cntr is
       clk1        : out std_logic);
    end component;
  
-   signal s_clk_1s   : std_logic;                     -- Der interne Takt welcher den Zähler steuert
-   signal s_count    : unsigned(11 downto 0);         -- Zählersignal
+   signal s_clk_1s      : std_logic;                     -- Der interne Takt welcher den Zähler steuert
+   signal s_next_count  : unsigned(15 downto 0) := (others => '0');
+   signal s_curr_count  : unsigned(15 downto 0) := (others => '0');         -- Zählersignal
     
    signal s_present_state : t_state;                  -- Der jetzige Zustand
    signal s_next_state    : t_state;                  -- Der nächste Zustand
    
     
-   signal s_cntr0_o : std_logic_vector(3 downto 0);   -- Interner Zähler auf Ziffer 1
-   signal s_cntr1_o : std_logic_vector(3 downto 0);   -- Interner Zähler auf Ziffer 2
-   signal s_cntr2_o : std_logic_vector(3 downto 0);   -- Interner Zähler auf Ziffer 3
-   signal s_cntr3_o : std_logic_vector(3 downto 0);   -- Interner Zähler auf Ziffer 4
+   signal s_cntr0_o : std_logic_vector(3 downto 0):= (others => '0');   -- Interner Zähler auf Ziffer 1
+   signal s_cntr1_o : std_logic_vector(3 downto 0):= (others => '0');   -- Interner Zähler auf Ziffer 2
+   signal s_cntr2_o : std_logic_vector(3 downto 0):= (others => '0');   -- Interner Zähler auf Ziffer 3
+   signal s_cntr3_o : std_logic_vector(3 downto 0):= (others => '0');   -- Interner Zähler auf Ziffer 4
 begin
 
    i_prescaler : prescaler
@@ -50,9 +51,9 @@ begin
       clk1     => s_clk_1s
    );
 
-   p_sync : process(clk50, reset_n)
+   p_sync : process(clk50, reset_n, s_curr_count)
    begin
-      if (reset_n = '1') then                         -- Externer Reset
+      if (reset_n = '0') then                         -- Externer Reset
          s_present_state <= UP;
          cntr0_o <= "0000";
          cntr1_o <= "0000";
@@ -63,9 +64,11 @@ begin
          s_cntr1_o <= "0000";
          s_cntr2_o <= "0000";
          s_cntr3_o <= "0000";
-         
+         s_curr_count <= (others => '0');
+                  
       elsif rising_edge(clk50) then                   -- Taktsignal
          s_present_state <= s_next_state;             -- Aktualisiert den Zustand
+         s_curr_count <= s_next_count;
          cntr0_o <= s_cntr0_o;                        -- Setzte externen cntr0
          cntr1_o <= s_cntr1_o;                        -- Setzte externen cntr1
          cntr2_o <= s_cntr2_o;                        -- Setzte externen cntr2
@@ -99,30 +102,38 @@ begin
       case s_present_state is
          when UP     => 
             if rising_edge(s_clk_1s) then
-               s_count <= s_count + x"1";
+               if(s_curr_count = x"270F") then
+                  s_next_count <= (others => '0');
+               else
+                  s_next_count <= s_curr_count + x"1";
+               end if;
             end if;
          when DOWN   => 
             if rising_edge(s_clk_1s) then
-               s_count <= s_count - x"1";
+               if(s_curr_count = x"0000") then
+                  s_next_count <= x"270F";
+               else
+                  s_next_count <= s_curr_count - x"1";
+               end if;
             end if;
-         when RESET  => s_count <= x"0";
+         when RESET  => s_next_count <= (others => '0');
          when HOLD   =>                               -- Do nothing
       end case;
    end process;
    
    p_outputform : process (
-      s_count,
+      s_curr_count,
       s_cntr0_o,
       s_cntr1_o,
       s_cntr2_o,
       s_cntr3_o
    )
-   variable v_count  : unsigned(11 downto 0) := x"0";
+   variable v_count  : unsigned(15 downto 0) := (others => '0');
    variable v_tmp    : unsigned(3 downto 0)  := x"0";
    begin
       if rising_edge(clk50) then
       
-         v_count := s_count;
+         v_count := s_curr_count;
          
          while v_count > x"38E" loop                  -- 1000 abziehen bis v_count kleiner als 1000 ist
             v_count := v_count - x"38E";
