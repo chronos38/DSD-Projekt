@@ -1,6 +1,6 @@
 library IEEE;
 use IEEE.std_logic_1164.all;
-use IEEE.NUMERIC_STD.all;
+use IEEE.numeric_std.all;
 
 --clk50     : in std_logic;
 --reset_n   : in std_logic;
@@ -16,143 +16,238 @@ use IEEE.NUMERIC_STD.all;
 --cntr3_o   : out std_logic_vector(3 downto 0));
 
 architecture rtl of cntr is
- -- Es gibt vier ZustÃ¤nde
- -- UP:    Zählt rauf
- -- DOWN:  Zählt runter
- -- HOLD:  Macht nichts
- -- RESET: Setzt alle Ziffern auf 0
-   type t_state is (UP, DOWN, HOLD, RESET);
- 
-   component prescaler
-      port (
-      clk50        : in std_logic;
-      reset_n    : in std_logic;
-      clk1        : out std_logic);
-   end component;
- 
-   signal s_clk_1s      : std_logic;                     -- Der interne Takt welcher den Zähler steuert
-   signal s_next_count  : unsigned(15 downto 0) := (others => '0');
-   signal s_curr_count  : unsigned(15 downto 0) := (others => '0');         -- Zählersignal
     
-   signal s_present_state : t_state;                  -- Der jetzige Zustand
-   signal s_next_state    : t_state;                  -- Der nächste Zustand
-   
+    component bcd
+        port (
+            clk50       : in std_logic;
+            reset_n     : in std_logic;
+            reset_i     : in std_logic; -- Interner Reset
+            enable_i    : in std_logic; -- '0'=FALSE und '1'=TRUE
+            operation_i : in std_logic; -- '0'=UP und '1'=DOWN
+            result_o    : out std_logic_vector(3 downto 0)); -- Ergebnis der Berechnung
+    end component;
+
+    -- Es gibt vier Zustände
+    -- UP:    Zählt rauf
+    -- DOWN:  Zählt runter
+    -- HOLD:  Macht nichts
+    -- RESET: Setzt alle Ziffern auf 0
+    type t_state is (UP, DOWN, HOLD, RESET);
+    signal s_present_state : t_state; -- Der jetzige Zustand
+    signal s_next_state    : t_state; -- Der nächste Zustand
     
-   signal s_cntr0_o : std_logic_vector(3 downto 0):= (others => '0');   -- Interner Zähler auf Ziffer 1
-   signal s_cntr1_o : std_logic_vector(3 downto 0):= (others => '0');   -- Interner Zähler auf Ziffer 2
-   signal s_cntr2_o : std_logic_vector(3 downto 0):= (others => '0');   -- Interner Zähler auf Ziffer 3
-   signal s_cntr3_o : std_logic_vector(3 downto 0):= (others => '0');   -- Interner Zähler auf Ziffer 4
+    signal s_cntr0_o : std_logic_vector(3 downto 0); -- Interner Zähler auf Ziffer 1
+    signal s_cntr1_o : std_logic_vector(3 downto 0); -- Interner Zähler auf Ziffer 2
+    signal s_cntr2_o : std_logic_vector(3 downto 0); -- Interner Zähler auf Ziffer 3
+    signal s_cntr3_o : std_logic_vector(3 downto 0); -- Interner Zähler auf Ziffer 4
+    
+    signal s_reset_bcd  : std_logic := '0'; -- Interner Reset für BCD
+    signal s_enable_bcd : std_logic_vector(3 downto 0) := "0000"; -- Enable für BCD, '1'=TRUE
+    signal s_op_bcd     : std_logic := '0'; -- Operation für BCD, '0'=UP '1'=DOWN
 begin
-
-   i_prescaler : prescaler
-   port map(
-      clk50    => clk50,
-      reset_n  => reset_n,
-      clk1     => s_clk_1s
-   );
-
-   p_sync : process(clk50, reset_n, s_curr_count)
-   begin
-      if (reset_n = '0') then                         -- Externer Reset
-         s_present_state <= UP;
-         cntr0_o <= "0000";
-         cntr1_o <= "0000";
-         cntr2_o <= "0000";
-         cntr3_o <= "0000";
-         s_curr_count <= (others => '0');
-                  
-      elsif rising_edge(clk50) then                   -- Taktsignal
-         s_present_state <= s_next_state;             -- Aktualisiert den Zustand
-         s_curr_count <= s_next_count;
-         cntr0_o <= s_cntr0_o;                        -- Setzte externen cntr0
-         cntr1_o <= s_cntr1_o;                        -- Setzte externen cntr1
-         cntr2_o <= s_cntr2_o;                        -- Setzte externen cntr2
-         cntr3_o <= s_cntr3_o;                        -- Setzte externen cntr3
-         end if;
-   end process;
-
-   p_next_state : process(
-      ctup_i,
-      ctdown_i,
-      ctreset_i,
-      cthold_i,
-      s_present_state,
-      s_next_state)
-   begin
-      if (ctup_i = '1') then
-         s_next_state <= UP;  
-      elsif (ctdown_i = '1') then
-         s_next_state <= DOWN;
-      elsif (ctreset_i = '1') then
-         s_next_state <= RESET;
-      elsif (cthold_i = '1') then
-         s_next_state <= HOLD;
-      end if;
-   end process;
-      
-   p_count : process(
-      s_clk_1s,
-      s_present_state)
-   begin
-      case s_present_state is
-         when UP     => 
-            if rising_edge(s_clk_1s) then
-               if(s_curr_count = x"270F") then
-                  s_next_count <= (others => '0');
-               else
-                  s_next_count <= s_curr_count + x"1";
-               end if;
-            end if;
-         when DOWN   => 
-            if rising_edge(s_clk_1s) then
-               if(s_curr_count = x"0000") then
-                  s_next_count <= x"270F";
-               else
-                  s_next_count <= s_curr_count - x"1";
-               end if;
-            end if;
-         when RESET  => s_next_count <= (others => '0');
-         when HOLD   =>                               -- Do nothing
-      end case;
-   end process;
-   
-   p_outputform : process (
-      s_curr_count,
-      s_cntr0_o,
-      s_cntr1_o,
-      s_cntr2_o,
-      s_cntr3_o
-   )
-   variable v_count  : unsigned(15 downto 0) := (others => '0');
-   variable v_tmp    : unsigned(3 downto 0)  := x"0";
-   begin
-     
-         v_count := s_curr_count;
-         v_tmp := x"0";
-         
-         while v_count >= x"38E" loop                  -- 1000 abziehen bis v_count kleiner als 1000 ist
-            v_count := v_count - x"38E";
-            v_tmp := v_tmp + x"1";
-         end loop;
-         
-         s_cntr3_o <= std_logic_vector(v_tmp);        -- v_temp ist unsere 1000er Stelle
-         v_tmp := x"0";
-         
-         while v_count >= x"64" loop
-            v_count := v_count - x"64";
-            v_tmp := v_tmp + x"1";
-         end loop;
-                  
-         s_cntr2_o <= std_logic_vector(v_tmp);
-         v_tmp := x"0";
-
-         while v_count >= x"A" loop
-            v_count := v_count - x"A";
-            v_tmp := v_tmp + x"1";
-         end loop;      
-
-         s_cntr1_o <= std_logic_vector(v_tmp);
-         s_cntr0_o <= std_logic_vector(v_count(3 downto 0));
-   end process;
-   
+    
+    i_bcd0 : bcd
+        port map(
+            clk50       => clk50,
+            reset_n     => reset_n,
+            reset_i     => s_reset_bcd,
+            enable_i    => s_enable_bcd(0),
+            operation_i => s_op_bcd,
+            result_o    => s_cntr0_o
+        );
+    
+    i_bcd1 : bcd
+        port map(
+            clk50       => clk50,
+            reset_n     => reset_n,
+            reset_i     => s_reset_bcd,
+            enable_i    => s_enable_bcd(1),
+            operation_i => s_op_bcd,
+            result_o    => s_cntr1_o
+        );
+    
+    i_bcd2 : bcd
+        port map(
+            clk50       => clk50,
+            reset_n     => reset_n,
+            reset_i     => s_reset_bcd,
+            enable_i    => s_enable_bcd(2),
+            operation_i => s_op_bcd,
+            result_o    => s_cntr2_o
+        );
+    
+    i_bcd3 : bcd
+        port map(
+            clk50       => clk50,
+            reset_n     => reset_n,
+            reset_i     => s_reset_bcd,
+            enable_i    => s_enable_bcd(3),
+            operation_i => s_op_bcd,
+            result_o    => s_cntr3_o
+        );
+    
+    p_state : process(clk50, reset_n)
+    begin
+        if (reset_n = '1') then -- Externer Reset
+            s_present_state <= UP;
+            cntr0_o <= "0000";
+            cntr1_o <= "0000";
+            cntr2_o <= "0000";
+            cntr3_o <= "0000";
+        elsif rising_edge(clk50) then -- Taktsignal
+            s_present_state <= s_next_state; -- Aktualisiert den Zustand
+            cntr0_o <= s_cntr0_o; -- Setzte externen cntr0
+            cntr1_o <= s_cntr1_o; -- Setzte externen cntr1
+            cntr2_o <= s_cntr2_o; -- Setzte externen cntr2
+            cntr3_o <= s_cntr3_o; -- Setzte externen cntr3
+        end if;
+    end process p_state;
+    
+    p_next : process(
+        s_present_state,
+        ctup_i,
+        ctdown_i,
+        ctreset_i,
+        cthold_i)
+    begin
+        case s_present_state is
+            when UP =>
+                s_reset_bcd  <= '0';
+                s_op_bcd     <= '0';
+                s_enable_bcd(0) <= '1';
+                
+                if (ctdown_i = '1') then
+                    s_next_state <= DOWN;
+                    s_reset_bcd  <= '0';
+                    s_op_bcd     <= '1';
+                    s_enable_bcd(0) <= '1';
+                elsif (ctreset_i = '1') then
+                    s_next_state <= RESET;
+                    s_reset_bcd  <= '1';
+                    s_op_bcd     <= '0';
+                    s_enable_bcd(0) <= '0';
+                elsif (cthold_i = '1') then
+                    s_next_state <= HOLD;
+                    s_reset_bcd  <= '0';
+                    s_op_bcd     <= '0';
+                    s_enable_bcd(0) <= '0';
+                end if;
+                
+            when DOWN =>
+                s_reset_bcd  <= '0';
+                s_op_bcd     <= '1';
+                s_enable_bcd(0) <= '1';
+                
+                if (ctup_i = '1') then
+                    s_next_state <= UP;
+                    s_reset_bcd  <= '0';
+                    s_op_bcd     <= '0';
+                    s_enable_bcd(0) <= '1';
+                elsif (ctreset_i = '1') then
+                    s_next_state <= RESET;
+                    s_reset_bcd  <= '1';
+                    s_op_bcd     <= '0';
+                    s_enable_bcd(0) <= '0';
+                elsif (cthold_i = '1') then
+                    s_next_state <= HOLD;
+                    s_reset_bcd  <= '0';
+                    s_op_bcd     <= '0';
+                    s_enable_bcd(0) <= '0';
+                end if;
+                
+            when HOLD =>
+                s_reset_bcd  <= '0';
+                s_op_bcd     <= '0';
+                s_enable_bcd(0) <= '0';
+                
+                if (ctup_i = '1') then
+                    s_next_state <= UP;
+                    s_reset_bcd  <= '0';
+                    s_op_bcd     <= '0';
+                    s_enable_bcd(0) <= '1';
+                elsif (ctdown_i = '1') then
+                    s_next_state <= DOWN;
+                    s_reset_bcd  <= '0';
+                    s_op_bcd     <= '1';
+                    s_enable_bcd(0) <= '1';
+                elsif (ctreset_i = '1') then
+                    s_next_state <= RESET;
+                    s_reset_bcd  <= '1';
+                    s_op_bcd     <= '0';
+                    s_enable_bcd(0) <= '0';
+                end if;
+                
+            when RESET =>
+                s_reset_bcd  <= '1';
+                s_op_bcd     <= '0';
+                s_enable_bcd(0) <= '0';
+                
+                if (ctup_i = '1') then
+                    s_next_state <= UP;
+                    s_reset_bcd  <= '0';
+                    s_op_bcd     <= '0';
+                    s_enable_bcd(0) <= '1';
+                elsif (ctdown_i = '1') then
+                    s_next_state <= DOWN;
+                    s_reset_bcd  <= '0';
+                    s_op_bcd     <= '1';
+                    s_enable_bcd(0) <= '1';
+                elsif (cthold_i = '1') then
+                    s_next_state <= HOLD;
+                    s_reset_bcd  <= '0';
+                    s_op_bcd     <= '0';
+                    s_enable_bcd(0) <= '0';
+                end if;
+        end case;
+    end process p_next;
+    
+    p_enable : process(
+        s_present_state,
+        s_cntr0_o,
+        s_cntr1_o,
+        s_cntr2_o,
+        s_cntr3_o)
+    begin
+        case s_present_state is
+            when UP =>
+                if (s_cntr0_o = "1001") then
+                    if (s_cntr1_o = "1001") then
+                        if (s_cntr2_o = "1001") then
+                            s_enable_bcd(3) <= '1';
+                        else
+                            s_enable_bcd(3) <= '0';
+                        end if;
+                        
+                        s_enable_bcd(2) <= '1';
+                    else
+                        s_enable_bcd(3 downto 2) <= "00";
+                    end if;
+                
+                    s_enable_bcd(1) <= '1';
+                else
+                    s_enable_bcd(3 downto 1) <= "000";
+                end if;
+                
+            when DOWN =>
+                if (s_cntr0_o = "0000") then
+                    if (s_cntr1_o = "0000") then
+                        if (s_cntr2_o = "0000") then
+                            s_enable_bcd(3) <= '1';
+                        else
+                            s_enable_bcd(3) <= '0';
+                        end if;
+                        
+                        s_enable_bcd(2) <= '1';
+                    else
+                        s_enable_bcd(3 downto 2) <= "00";
+                    end if;
+                    
+                    s_enable_bcd(1) <= '1';
+                else
+                    s_enable_bcd(3 downto 1) <= "000";
+                end if;
+                
+            when others =>
+        end case;
+    end process p_enable;
 end rtl;
