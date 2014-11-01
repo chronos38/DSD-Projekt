@@ -42,26 +42,26 @@ begin
       cntr2_o     => s_cntr2_o,
       cntr3_o     => s_cntr3_o);
 	 
-	s_clk50 <= not s_clk50 after 1 ps;
+	s_clk50 <= not s_clk50 after 1 ns;
 
    p_test : process
       begin
          s_reset_n <= '0';
-         wait for 10 ps;
+         wait for 10 ns;
          s_reset_n <= '1';
-         wait for 10 ps;
+         wait for 10 ns;
          s_ctup_i <= '1';
-         wait for 10 ps;
+         wait for 10 ns;
          s_ctup_i <= '0';
-         wait for 1000 ps;
+         wait for 1000 ns;
          s_cthold_i <= '1';
-         wait for 10 ps;
+         wait for 10 ns;
          s_cthold_i <= '0';
-         wait for 200 ps;
+         wait for 200 ns;
          s_ctdown_i <= '1';
-         wait for 10 ps;
+         wait for 10 ns;
          s_ctdown_i <= '0';
-         wait for 1000 ps;
+         wait for 1000 ns;
 
       end process;
 

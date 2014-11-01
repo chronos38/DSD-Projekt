@@ -59,11 +59,6 @@ begin
          cntr1_o <= "0000";
          cntr2_o <= "0000";
          cntr3_o <= "0000";
-         
-         s_cntr0_o <= "0000";
-         s_cntr1_o <= "0000";
-         s_cntr2_o <= "0000";
-         s_cntr3_o <= "0000";
          s_curr_count <= (others => '0');
                   
       elsif rising_edge(clk50) then                   -- Taktsignal
@@ -131,11 +126,11 @@ begin
    variable v_count  : unsigned(15 downto 0) := (others => '0');
    variable v_tmp    : unsigned(3 downto 0)  := x"0";
    begin
-      if rising_edge(clk50) then
-      
+     
          v_count := s_curr_count;
+         v_tmp := x"0";
          
-         while v_count > x"38E" loop                  -- 1000 abziehen bis v_count kleiner als 1000 ist
+         while v_count >= x"38E" loop                  -- 1000 abziehen bis v_count kleiner als 1000 ist
             v_count := v_count - x"38E";
             v_tmp := v_tmp + x"1";
          end loop;
@@ -143,7 +138,7 @@ begin
          s_cntr3_o <= std_logic_vector(v_tmp);        -- v_temp ist unsere 1000er Stelle
          v_tmp := x"0";
          
-         while v_count > x"64" loop
+         while v_count >= x"64" loop
             v_count := v_count - x"64";
             v_tmp := v_tmp + x"1";
          end loop;
@@ -151,14 +146,13 @@ begin
          s_cntr2_o <= std_logic_vector(v_tmp);
          v_tmp := x"0";
 
-         while v_count > x"A" loop
+         while v_count >= x"A" loop
             v_count := v_count - x"A";
             v_tmp := v_tmp + x"1";
          end loop;      
 
          s_cntr1_o <= std_logic_vector(v_tmp);
          s_cntr0_o <= std_logic_vector(v_count(3 downto 0));
-      end if;
    end process;
    
 end rtl;
