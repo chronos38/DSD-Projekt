@@ -37,7 +37,7 @@ begin
    i_sw_debouncer : debounce
       generic map (
          WIDTH       => s_ff_swsync1'length,
-         DELAY       => 20)
+         DELAY       => 156)
       port map (
          clk50       => clk50,
          keyin_i     => s_ff_swsync1,
@@ -47,7 +47,7 @@ begin
    i_pb_debouncer : debounce
       generic map (
          WIDTH    => s_ff_pbsync1'length,
-         DELAY       => 20)
+         DELAY       => 156)
       port map (
          clk50    => clk50,
          keyin_i  => s_ff_pbsync1,
