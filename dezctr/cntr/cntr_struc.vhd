@@ -46,12 +46,12 @@ architecture rtl of cntr is
     signal s_clk_1s : std_logic := '0'; -- Der interne Takt welcher den Zähler steuert
     
     signal s_cntr0_o : std_logic_vector(3 downto 0) := (others => '0'); -- Interner Zähler auf Ziffer 1
-    signal s_cntr1_o : std_logic_vector(3 downto 0) := "0000"; -- Interner Zähler auf Ziffer 2
+    signal s_cntr1_o : std_logic_vector(3 downto 0) := (others => '0'); -- Interner Zähler auf Ziffer 2
     signal s_cntr2_o : std_logic_vector(3 downto 0) := (others => '0'); -- Interner Zähler auf Ziffer 3
-    signal s_cntr3_o : std_logic_vector(3 downto 0) := "0000"; -- Interner Zähler auf Ziffer 4
+    signal s_cntr3_o : std_logic_vector(3 downto 0) := (others => '0'); -- Interner Zähler auf Ziffer 4
     
     signal s_reset_bcd  : std_logic := '0'; -- Interner Reset für BCD
-    signal s_enable_bcd : std_logic_vector(3 downto 0) := "0000"; -- Enable für BCD, '1'=TRUE
+    signal s_enable_bcd : std_logic_vector(3 downto 0) := (others => '0'); -- Enable für BCD, '1'=TRUE
     signal s_op_bcd     : std_logic := '0'; -- Operation für BCD, '0'=UP '1'=DOWN
 begin
     i_prescaler : prescaler
@@ -105,10 +105,10 @@ begin
     begin
         if (reset_n = '0') then -- Externer Reset
             s_present_state <= UP;
-            cntr0_o <= "0000";
-            cntr1_o <= "0000";
-            cntr2_o <= "0000";
-            cntr3_o <= "0000";
+            cntr0_o <= (others => '0');
+            cntr1_o <= (others => '0');
+            cntr2_o <= (others => '0');
+            cntr3_o <= (others => '0');
         elsif rising_edge(clk50) then -- Taktsignal
             s_present_state <= s_next_state; -- Aktualisiert den Zustand
             cntr0_o <= s_cntr0_o; -- Setzte externen cntr0

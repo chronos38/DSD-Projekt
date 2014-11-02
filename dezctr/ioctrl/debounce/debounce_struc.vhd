@@ -6,7 +6,8 @@ architecture behavioral of debounce is
     signal s_keydeb : std_logic_vector(WIDTH-1 downto 0) := (others=>'0');
     signal s_debcnt : integer range 0 to DELAY + 1 := 0;
 begin
-   process begin
+   p_debounce: process
+   begin
       wait until rising_edge(clk50);
         
       if (keyin_i = s_keydeb) then 
@@ -19,6 +20,7 @@ begin
             s_keydeb <= keyin_i; 
       end if;
    end process;
+   
    keyout_o <= s_keydeb;
 
 end behavioral;
