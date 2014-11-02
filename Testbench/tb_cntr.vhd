@@ -55,21 +55,12 @@ begin
     p_test : process
     begin
         -- Testfall: Externer Reset
-        -- Alle Eingänge auf '1'
+        -- Externer Reset '0' der Rest '1'
         s_reset_n   <= '0';
         s_ctup_i    <= '1';
         s_ctdown_i  <= '1';
         s_cthold_i  <= '1';
         s_ctreset_i <= '1';
-        wait for 1 ns;
-        
-        -- Testfall: Nach Reset sollte der Zustand UP sein.
-        -- Alle Eingänge auf '0'
-        s_reset_n   <= '1';
-        s_ctup_i    <= '0';
-        s_ctdown_i  <= '0';
-        s_cthold_i  <= '0';
-        s_ctreset_i <= '0';
         wait for 1 ns;
         
         -- Testfall: DOWN
@@ -79,16 +70,16 @@ begin
         s_ctdown_i  <= '1';
         s_cthold_i  <= '0';
         s_ctreset_i <= '0';
-        wait for 5 ns;
+        wait for 17 ns;
         
         -- Testfall: UP
-        -- s_ctdown_i auf '1'
+        -- s_ctdup_i auf '1'
         s_reset_n   <= '1';
         s_ctup_i    <= '1';
         s_ctdown_i  <= '0';
         s_cthold_i  <= '0';
         s_ctreset_i <= '0';
-        wait for 5 ns;
+        wait for 30 ns;
         
         -- Testfall: HOLD
         -- s_ctdown_i auf '1'
@@ -108,12 +99,30 @@ begin
         s_ctreset_i <= '1';
         wait for 1 ns;
         
-        -- Testfall: Externer Reset '0', der Rest '1'
+        -- Testfall: Alle Eingänge auf '1'
         s_reset_n   <= '1';
         s_ctup_i    <= '1';
         s_ctdown_i  <= '1';
         s_cthold_i  <= '1';
         s_ctreset_i <= '1';
         wait for 1 ns;
+        
+        -- Testfall: Externer Reset
+        -- Alle Eingänge '0'
+        s_reset_n   <= '0';
+        s_ctup_i    <= '0';
+        s_ctdown_i  <= '0';
+        s_cthold_i  <= '0';
+        s_ctreset_i <= '0';
+        wait for 1 ns;
+        
+        -- Testfall: Nach Reset sollte der Zustand UP sein.
+        -- Alle Eingänge auf '0'
+        s_reset_n   <= '1';
+        s_ctup_i    <= '0';
+        s_ctdown_i  <= '0';
+        s_cthold_i  <= '0';
+        s_ctreset_i <= '0';
+        wait for 100 ps;
     end process p_test;
 end sim;

@@ -101,7 +101,7 @@ begin
             result_o    => s_cntr3_o
         );
     
-    p_state : process(clk50, reset_n)
+    p_main : process(clk50, reset_n)
     begin
         if (reset_n = '0') then -- Externer Reset
             s_present_state <= UP;
@@ -116,107 +116,26 @@ begin
             cntr2_o <= s_cntr2_o; -- Setzte externen cntr2
             cntr3_o <= s_cntr3_o; -- Setzte externen cntr3
         end if;
-    end process p_state;
+    end process p_main;
     
     p_next : process(
-        s_present_state,
         ctup_i,
         ctdown_i,
         ctreset_i,
         cthold_i)
     begin
-        case s_present_state is
-            when UP =>
-                s_reset_bcd  <= '0';
-                s_op_bcd     <= '0';
-                s_enable_bcd(0) <= '1';
-                
-                if (ctdown_i = '1') then
-                    s_next_state <= DOWN;
-                    s_reset_bcd  <= '0';
-                    s_op_bcd     <= '1';
-                    s_enable_bcd(0) <= '1';
-                elsif (ctreset_i = '1') then
-                    s_next_state <= RESET;
-                    s_reset_bcd  <= '1';
-                    s_op_bcd     <= '0';
-                    s_enable_bcd(0) <= '0';
-                elsif (cthold_i = '1') then
-                    s_next_state <= HOLD;
-                    s_reset_bcd  <= '0';
-                    s_op_bcd     <= '0';
-                    s_enable_bcd(0) <= '0';
-                end if;
-                
-            when DOWN =>
-                s_reset_bcd  <= '0';
-                s_op_bcd     <= '1';
-                s_enable_bcd(0) <= '1';
-                
-                if (ctup_i = '1') then
-                    s_next_state <= UP;
-                    s_reset_bcd  <= '0';
-                    s_op_bcd     <= '0';
-                    s_enable_bcd(0) <= '1';
-                elsif (ctreset_i = '1') then
-                    s_next_state <= RESET;
-                    s_reset_bcd  <= '1';
-                    s_op_bcd     <= '0';
-                    s_enable_bcd(0) <= '0';
-                elsif (cthold_i = '1') then
-                    s_next_state <= HOLD;
-                    s_reset_bcd  <= '0';
-                    s_op_bcd     <= '0';
-                    s_enable_bcd(0) <= '0';
-                end if;
-                
-            when HOLD =>
-                s_reset_bcd  <= '0';
-                s_op_bcd     <= '0';
-                s_enable_bcd(0) <= '0';
-                
-                if (ctup_i = '1') then
-                    s_next_state <= UP;
-                    s_reset_bcd  <= '0';
-                    s_op_bcd     <= '0';
-                    s_enable_bcd(0) <= '1';
-                elsif (ctdown_i = '1') then
-                    s_next_state <= DOWN;
-                    s_reset_bcd  <= '0';
-                    s_op_bcd     <= '1';
-                    s_enable_bcd(0) <= '1';
-                elsif (ctreset_i = '1') then
-                    s_next_state <= RESET;
-                    s_reset_bcd  <= '1';
-                    s_op_bcd     <= '0';
-                    s_enable_bcd(0) <= '0';
-                end if;
-                
-            when RESET =>
-                s_reset_bcd  <= '1';
-                s_op_bcd     <= '0';
-                s_enable_bcd(0) <= '0';
-                
-                if (ctup_i = '1') then
-                    s_next_state <= UP;
-                    s_reset_bcd  <= '0';
-                    s_op_bcd     <= '0';
-                    s_enable_bcd(0) <= '1';
-                elsif (ctdown_i = '1') then
-                    s_next_state <= DOWN;
-                    s_reset_bcd  <= '0';
-                    s_op_bcd     <= '1';
-                    s_enable_bcd(0) <= '1';
-                elsif (cthold_i = '1') then
-                    s_next_state <= HOLD;
-                    s_reset_bcd  <= '0';
-                    s_op_bcd     <= '0';
-                    s_enable_bcd(0) <= '0';
-                end if;
-        end case;
+        if (ctup_i = '1') then
+            s_next_state <= UP;
+        elsif (ctdown_i = '1') then
+            s_next_state <= DOWN;
+        elsif (ctreset_i = '1') then
+            s_next_state <= RESET;
+        elsif (cthold_i = '1') then
+            s_next_state <= HOLD;
+        end if;
     end process p_next;
     
-    p_enable : process(
+    p_state : process(
         s_present_state,
         s_cntr0_o,
         s_cntr1_o,
@@ -243,6 +162,10 @@ begin
                     s_enable_bcd(3 downto 1) <= "000";
                 end if;
                 
+                s_reset_bcd  <= '0';
+                s_op_bcd     <= '0';
+                s_enable_bcd(0) <= '1';
+                
             when DOWN =>
                 if (s_cntr0_o = "0000") then
                     if (s_cntr1_o = "0000") then
@@ -262,7 +185,19 @@ begin
                     s_enable_bcd(3 downto 1) <= "000";
                 end if;
                 
-            when others =>
+                s_reset_bcd  <= '0';
+                s_op_bcd     <= '1';
+                s_enable_bcd(0) <= '1';
+                
+            when HOLD =>
+                s_reset_bcd  <= '0';
+                s_op_bcd     <= '0';
+                s_enable_bcd <= "0000";
+                
+            when RESET =>
+                s_reset_bcd  <= '1';
+                s_op_bcd     <= '0';
+                s_enable_bcd <= "0000";
         end case;
-    end process p_enable;
+    end process p_state;
 end rtl;
