@@ -128,9 +128,9 @@ begin
             s_next_state <= RESET;
         elsif (cthold_i = '1') then
             s_next_state <= HOLD;
-        elsif (ctup_i = '1') then
+        elsif (ctup_i = '0') then
             s_next_state <= UP;
-        elsif (ctdown_i = '1') then
+        elsif (ctdown_i = '0') then
             s_next_state <= DOWN;
         end if;
     end process p_next;
