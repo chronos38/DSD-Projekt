@@ -124,14 +124,14 @@ begin
         ctreset_i,
         cthold_i)
     begin
-        if (ctup_i = '1') then
-            s_next_state <= UP;
-        elsif (ctdown_i = '1') then
-            s_next_state <= DOWN;
-        elsif (ctreset_i = '1') then
+        if (ctreset_i = '1') then
             s_next_state <= RESET;
         elsif (cthold_i = '1') then
             s_next_state <= HOLD;
+        elsif (ctup_i = '1') then
+            s_next_state <= UP;
+        elsif (ctdown_i = '1') then
+            s_next_state <= DOWN;
         end if;
     end process p_next;
     
