@@ -119,46 +119,20 @@ begin
     end process p_main;
     
     p_next : process(
-        s_present_state,
         ctup_i,
         ctdown_i,
         ctreset_i,
         cthold_i)
     begin
-        case s_present_state is
-            when UP =>
-                if (ctreset_i = '1') then
-                    s_next_state <= RESET;
-                elsif (cthold_i = '1') then
-                    s_next_state <= HOLD;
-                elsif (ctdown_i = '1') then
-                    s_next_state <= DOWN;
-                end if;
-            when DOWN =>
-                if (ctreset_i = '1') then
-                    s_next_state <= RESET;
-                elsif (cthold_i = '1') then
-                    s_next_state <= HOLD;
-                elsif (ctup_i = '1') then
-                    s_next_state <= UP;
-                end if;
-            when HOLD =>
-                if (ctreset_i = '1') then
-                    s_next_state <= RESET;
-                elsif (ctup_i = '1') then
-                    s_next_state <= UP;
-                elsif (ctdown_i = '1') then
-                    s_next_state <= DOWN;
-                end if;
-            when RESET =>
-                if (cthold_i = '1') then
-                    s_next_state <= HOLD;
-                elsif (ctup_i = '1') then
-                    s_next_state <= UP;
-                elsif (ctdown_i = '1') then
-                    s_next_state <= DOWN;
-                end if;
-        end case;
+        if (ctreset_i = '1') then
+            s_next_state <= RESET;
+        elsif (cthold_i = '1') then
+            s_next_state <= HOLD;
+        elsif (ctup_i = '1') then
+            s_next_state <= UP;
+        elsif (ctdown_i = '1') then
+            s_next_state <= DOWN;
+        end if;
     end process p_next;
     
     p_state : process(
