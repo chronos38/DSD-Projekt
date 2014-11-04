@@ -117,6 +117,22 @@ begin
         s_ctreset_i <= '0';
         wait for 1 ns;
         
+        -- Testfall: UP auf DOWN
+        s_reset_n   <= '1';
+        s_ctup_i    <= '1';
+        s_ctdown_i  <= '0';
+        s_cthold_i  <= '0';
+        s_ctreset_i <= '0';
+        wait for 1 ns;
+        
+        -- Testfall: DOWN auf UP
+        s_reset_n   <= '1';
+        s_ctup_i    <= '0';
+        s_ctdown_i  <= '1';
+        s_cthold_i  <= '0';
+        s_ctreset_i <= '0';
+        wait for 1 ns;
+        
         -- Testfall: RESET
         -- s_ctdown_i auf '1'
         s_reset_n   <= '1';
