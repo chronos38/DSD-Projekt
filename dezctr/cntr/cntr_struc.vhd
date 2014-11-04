@@ -40,8 +40,8 @@ architecture rtl of cntr is
     -- HOLD:  Macht nichts
     -- RESET: Setzt alle Ziffern auf 0
     type t_state is (UP, DOWN, HOLD, RESET);
-    signal s_present_state : t_state; -- Der jetzige Zustand
-    signal s_next_state    : t_state; -- Der nächste Zustand
+    signal s_present_state : t_state := UP; -- Der jetzige Zustand
+    signal s_next_state    : t_state := UP; -- Der nächste Zustand
     
     signal s_clk_1s : std_logic := '0'; -- Der interne Takt welcher den Zähler steuert
     
@@ -53,6 +53,8 @@ architecture rtl of cntr is
     signal s_reset_bcd  : std_logic := '0'; -- Interner Reset für BCD
     signal s_enable_bcd : std_logic_vector(3 downto 0) := (others => '0'); -- Enable für BCD, '1'=TRUE
     signal s_op_bcd     : std_logic := '0'; -- Operation für BCD, '0'=UP '1'=DOWN
+    
+    signal s_saved_state : t_state := UP; -- Zwischenspeicher für den Zustand
 begin
     i_prescaler : prescaler
         port map(
@@ -119,20 +121,36 @@ begin
     end process p_main;
     
     p_next : process(
+        s_present_state,
         ctup_i,
         ctdown_i,
         ctreset_i,
         cthold_i)
     begin
-        if (ctreset_i = '1') then
-            s_next_state <= RESET;
-        elsif (cthold_i = '1') then
-            s_next_state <= HOLD;
-        elsif (ctup_i = '0') then
-            s_next_state <= UP;
-        elsif (ctdown_i = '0') then
-            s_next_state <= DOWN;
-        end if;
+        case s_present_state is
+            when RESET =>
+                if (ctreset_i = '0') then
+                    s_next_state <= s_saved_state;
+                end if;
+            
+            when HOLD =>
+                if (cthold_i = '0') then
+                    s_next_state <= s_saved_state;
+                end if;
+            
+            when others =>
+                if (ctreset_i = '1') then
+                    s_saved_state <= s_present_state;
+                    s_next_state  <= RESET;
+                elsif (cthold_i = '1') then
+                    s_saved_state <= s_present_state;
+                    s_next_state  <= HOLD;
+                elsif (ctup_i = '0') then
+                    s_next_state <= UP;
+                elsif (ctdown_i = '0') then
+                    s_next_state <= DOWN;
+                end if;
+        end case;
     end process p_next;
     
     p_state : process(

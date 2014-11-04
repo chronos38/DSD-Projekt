@@ -55,28 +55,46 @@ begin
     p_test : process
     begin
         -- Testfall: Externer Reset
-        -- Externer Reset '0' der Rest '1'
+        -- Externer Reset '0' der Rest deaktiviert
         s_reset_n   <= '0';
         s_ctup_i    <= '1';
         s_ctdown_i  <= '1';
-        s_cthold_i  <= '1';
-        s_ctreset_i <= '1';
+        s_cthold_i  <= '0';
+        s_ctreset_i <= '0';
         wait for 1 ns;
         
         -- Testfall: DOWN
         -- s_ctdown_i auf '1'
         s_reset_n   <= '1';
-        s_ctup_i    <= '0';
-        s_ctdown_i  <= '1';
+        s_ctup_i    <= '1';
+        s_ctdown_i  <= '0';
         s_cthold_i  <= '0';
         s_ctreset_i <= '0';
         wait for 17 ns;
         
+        -- Testfall: HOLD
+        -- s_ctdown_i auf '1'
+        s_reset_n   <= '1';
+        s_ctup_i    <= '0';
+        s_ctdown_i  <= '0';
+        s_cthold_i  <= '1';
+        s_ctreset_i <= '0';
+        wait for 1 ns;
+        
+        -- Testfall: HOLD auf DOWN
+        -- s_ctdown_i auf '1'
+        s_reset_n   <= '1';
+        s_ctup_i    <= '1';
+        s_ctdown_i  <= '1';
+        s_cthold_i  <= '0';
+        s_ctreset_i <= '0';
+        wait for 1 ns;
+        
         -- Testfall: UP
         -- s_ctdup_i auf '1'
         s_reset_n   <= '1';
-        s_ctup_i    <= '1';
-        s_ctdown_i  <= '0';
+        s_ctup_i    <= '0';
+        s_ctdown_i  <= '1';
         s_cthold_i  <= '0';
         s_ctreset_i <= '0';
         wait for 30 ns;
@@ -87,6 +105,15 @@ begin
         s_ctup_i    <= '0';
         s_ctdown_i  <= '0';
         s_cthold_i  <= '1';
+        s_ctreset_i <= '0';
+        wait for 1 ns;
+        
+        -- Testfall: HOLD auf UP
+        -- s_ctdown_i auf '1'
+        s_reset_n   <= '1';
+        s_ctup_i    <= '1';
+        s_ctdown_i  <= '1';
+        s_cthold_i  <= '0';
         s_ctreset_i <= '0';
         wait for 1 ns;
         
