@@ -19,7 +19,7 @@ begin
             s_clk1 <= '0';
             s_counter <= (others => '0');
         elsif rising_edge(clk50) then
-            if s_counter = x"17D7840" then -- 17D7840 für fpga, 1388 für sim 
+            if s_counter = x"17D7840" then -- 17D7840 für fpga, 20 für sim 
                 s_clk1 <= not s_clk1;              
                 s_counter <= (others => '0');
             else
