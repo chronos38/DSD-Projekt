@@ -1,3 +1,9 @@
+-------------------------------------------------------------------------------
+-- Author:  David Wolf, Leonhardt Schwarz
+-- Project: FPGA Project
+--
+-- Copyright (C) 2014 David Wolf, Leonhardt Schwarz
+-------------------------------------------------------------------------------
 library IEEE;
 use IEEE.std_logic_1164.all;
 

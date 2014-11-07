@@ -1,3 +1,9 @@
+-------------------------------------------------------------------------------
+-- Author:  David Wolf, Leonhardt Schwarz
+-- Project: FPGA Project
+--
+-- Copyright (C) 2014 David Wolf, Leonhardt Schwarz
+-------------------------------------------------------------------------------
 library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
@@ -18,7 +24,7 @@ begin
             when "0111" => ss_o <= "11111000"; -- 7
             when "1000" => ss_o <= "10000000"; -- 8
             when "1001" => ss_o <= "10010000"; -- 9
-            when others => ss_o <= "01111111"; -- hurr
+            when others => ss_o <= "11111111"; -- hurr
          end case;
       end if;
    end process;
