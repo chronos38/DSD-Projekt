@@ -40,6 +40,8 @@ architecture Behavioral of ioctrl is
    
    signal s_reset_occured     : std_logic := '1';
    signal s_cycle_counter     : integer range 0 to 100 := 0;
+   
+   signal s_initial_sw        : std_logic_vector(9 downto 0) := (others => '0'); -- Intialzustand für Schalter
 begin
 
    -- Entprellt die Schalter
@@ -106,11 +108,13 @@ begin
          s_ff_pbsync1      <= (others => '0');
          s_ff_swsync0      <= (others => '0');
          s_ff_swsync1      <= (others => '0');
+         s_cycle_counter <= 0;
          
       elsif rising_edge(clk50) then
          
-         if (s_reset_occured = '1' and s_cycle_counter < 100)  then
+         if (s_reset_occured = '1' and s_cycle_counter < 1)  then
             s_cycle_counter <= s_cycle_counter + 1;
+            s_initial_sw    <= sw_i; -- Nach Reset wird der Initialzustand gespeichert.
          else
             s_reset_occured <= '0';
                
@@ -118,10 +122,9 @@ begin
             s_ff_pbsync1 <= s_ff_pbsync0;
             s_ff_swsync0 <= sw_i;
             s_ff_swsync1 <= s_ff_swsync0;
-            
-            swsync_o <= s_swsync;
+            swsync_o <= s_swsync xor s_initial_sw;
             pbsync_o <= s_pbsync;
          end if;
-end if;
+      end if;
    end process;
 end architecture Behavioral;
